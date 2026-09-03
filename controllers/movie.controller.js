@@ -1,35 +1,17 @@
+const { response } = require('express');
 const Movie = require('../models/movies.model');
 const movieService = require('../services/movie.service');
-const errorResponseBody = {
-    err: {},
-    data: {},
-    message:"Something went wrong, cannot process request",
-    success: false
-}
-const succesResponseBody= {
-    err: {},
-    data: {},
-    message:"Successfully processed",
-    success: true 
-}
+const{succesResponseBody,errorResponseBody} = require('../utils/responsebody');
 const createmovie = async(req,res) => {
     try{
 
-        const  movie = await Movie.create(req.body);
-        return res.status(201).json({
-            success: true,
-            error: {},
-            data: movie,
-            message : "successfully created a movie",
-        })
+        const  movie = await movieService.createmovie(req.body);
+        succesResponseBody.data= movie;
+        succesResponseBody.message = "Successfully created the movie";
+        return res.status(201).json(succesResponseBody);
     } catch(err) {
         console.log(err);
-        return res.status(500).json({
-            success: true,
-            error: err,
-            data: {},
-            message : "something went wrong",          
-        });
+        return res.status(500).json(errorResponseBody);
 
     }
 
@@ -37,24 +19,15 @@ const createmovie = async(req,res) => {
 const deletemovie = async (req, res) => {
     try {
 
-        const movie = await Movie.findByIdAndDelete(req.params.id);
-
-        return res.status(200).json({
-            success: true,
-            error: {},
-            data: movie,
-            message: "Successfully deleted movie"
-        });
+        const response = await movieService.deletemovie(req.params.id);
+        succesResponseBody.data = response;
+        succesResponseBody.message = "Successfully deleted the movie";
+        return res.status(200).json(succesResponseBody);
 
     } catch (err) {
         console.log(err);
 
-        return res.status(500).json({
-            success: false,
-            error: err,
-            data: {},
-            message: "Something went wrong, cannot delete movie",
-        });
+        return res.status(500).json(errorResponseBody);
     }
 };
 const getMovie = async(req,res) => {
